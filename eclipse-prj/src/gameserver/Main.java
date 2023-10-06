@@ -11,7 +11,7 @@ public class Main
 {
 	public static void main(String[] args)
 	{
-		final int CASC_PORT = args.length != 0 ? Integer.parseInt(args[0]) : 11111;
+		final int CASC_PORT = args.length != 0 ? Integer.parseInt(args[0]) : 31193;
 		new Server2(CASC_PORT).run();
 	}
 }
