@@ -1,6 +1,12 @@
 - build image: (in Dockerfile dir)
     - `sudo docker build -t <img-name> .`
 - run container from image:
-    - `sudo docker run -dit --name <cnt-name> <img-name>`
+    - `sudo docker run -dit -p port:port --name <cnt-name> <img-name>`
+    - the port mapping is required even if it's the same port
 - access running container:
-    - `sudo docker exec -it <cnt-name> /bin/bash  `
+    - `sudo docker exec -it <cnt-name> /bin/bash `
+- clean up:
+    - `docker container prune`
+    - `docker image prune`
+    - `docker volume prune`
+    - `docker system prune`
