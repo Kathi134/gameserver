@@ -1,0 +1,6 @@
+- build image: (in Dockerfile dir)
+    - `sudo docker build -t <img-name> .`
+- run container from image:
+    - `sudo docker run -dit --name <cnt-name> <img-name>`
+- access running container:
+    - `sudo docker exec -it <cnt-name> /bin/bash  `
