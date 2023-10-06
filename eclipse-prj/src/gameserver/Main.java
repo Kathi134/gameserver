@@ -1,4 +1,4 @@
-package eclipse_prj_gameserver;
+package gameserver;
 
 import java.io.BufferedReader;
 import java.io.IOException;
