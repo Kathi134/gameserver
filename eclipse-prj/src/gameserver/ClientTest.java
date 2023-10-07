@@ -12,9 +12,9 @@ public class ClientTest
 {
 	public static void main(String[] args)
 	{
-		final int CASC_PORT = args.length != 0 ? Integer.parseInt(args[0]) : 31193;
+		final int PORT = Main.GAME_PORT;
 		final String serverIp = "185.249.198.58";
-		new Client(CASC_PORT, serverIp).run();
+		new Client(PORT, serverIp).run();
 	}
 }
 

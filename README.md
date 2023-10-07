@@ -6,6 +6,10 @@
 - create session for specific port and get session id in return
 - further interact with port + session id from all devices willing to join this gaming session
 
+### data
+- initial request to: `185.249.198.58:51317`
+
+
 ## structure
 - Docker container serving requests/ports run on server 185.249.198.58
     - automatically compiling this checked out git repository on Main.java
