@@ -1,107 +1,74 @@
 package gameserver;
 
-import java.io.BufferedReader;
-import java.io.Closeable;
 import java.io.IOException;
-import java.io.InputStreamReader;
-import java.io.PrintWriter;
-import java.net.InetAddress;
 import java.net.ServerSocket;
-import java.net.Socket;
+import java.rmi.RemoteException;
+import java.rmi.registry.LocateRegistry;
+import java.rmi.registry.Registry;
 
-import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
-
-import okhttp3.MediaType;
-import okhttp3.OkHttpClient;
-import okhttp3.Request;
-import okhttp3.RequestBody;
-import okhttp3.Response;
-
-class GlobalServer
+import utils.Connection;
+import utils.request.Data;
+import utils.request.Game;
+import utils.request.Request;
+import utils.request.RequestType;
+	
+public class GlobalServer
 {
 	private final int PORT;
 	
-	public GlobalServer(int p)
+	public GlobalServer(int p) 
 	{
+		System.out.println("starting server...");
 		PORT = p;
-		OkHttpClient client = new OkHttpClient () ;
+//		GameService service;
+		
 	}
 
 	public void run()
 	{
-		System.out.println("server is listening");
+		prepareRMIService();
 		try
 		(
 			ServerSocket ss = new ServerSocket(PORT);
 			Connection c = new Connection(ss.accept());
 		)
 		{
-			String host = c.getClientAddress().getHostName();
-			System.out.println("connection request from " + host);
-			String msg = "Hello from the Server. You are " + host;
-			c.print(msg);
-			String answer = c.read();		
-			System.out.println("answer from " + host + ": " + answer);	
+			System.out.println("connection established with a client");
+			Request tmp = c.read();
+			Data d = new Data();
+			if(tmp.type() == RequestType.PORT_REQUEST)
+			{
+				int port = switch ((Game)(tmp.laod()[0]))
+				{
+					case CASCADIA -> 31193;
+				};
+				d.i = port;
+			}
+			Request request = new Request(RequestType.PORT_REQUEST, d);
+			c.print(request);
 		}
 		catch (IOException e)
 		{
 			e.printStackTrace();
 		}
 	}
-}
-
-class Connection implements Closeable
-{
-	private Socket commSocket;
-	private PrintWriter out;
-	private BufferedReader in;
 	
-	public Connection(Socket commSocket)
+	private void prepareRMIService()
 	{
-		this.commSocket = commSocket;
+		System.out.println("initializing services...");
 		try
 		{
-			out = new PrintWriter(commSocket.getOutputStream(), true);
-			in = new BufferedReader(new InputStreamReader(commSocket.getInputStream()));
+			LocateRegistry.createRegistry(Registry.REGISTRY_PORT);
+			var service = new GameService();
+			// Stub von Remote-Objekt in Registry bekanntmachen
+			Registry registry = LocateRegistry.getRegistry();
+			registry.rebind("GameServiceInterface", service);
+			System.out.println("server ready!");
 		}
-		catch (IOException e)
+		catch (RemoteException e)
 		{
+			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 	}
-	
-	@Override
-	public void close() throws IOException
-	{}
-	
-	public InetAddress getClientAddress()
-	{
-		return commSocket.getInetAddress();
-	}
-	
-	public void print(Object o)
-	{
-		out.print(o);
-	}
-	
-	public <T> T read()
-	{
-		T result = null;
-		try
-		{
-			result = (T) in.readLine();
-		}
-		catch (IOException e)
-		{
-			e.printStackTrace();
-		}
-		return result;
-	}
-}
-
-class Packet
-{
-	private int gamePort;
-	private int sessionId;
 }
