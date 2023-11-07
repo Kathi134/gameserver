@@ -24,8 +24,13 @@ public class Lobby
 	
 	public void addClient(ClientAddressInformation cai)
 	{
-		System.out.println("added" + cai.toString());
 		clients.add(cai);
-		clients.stream().forEach(c -> System.out.print(c.a()));
+	}
+	
+	public void notifyAllClients(String message)
+	{
+		clients.stream()
+			.map(cai -> cai.callback())
+			.forEach(c -> c.accept("ring ring: " + message));
 	}
 }

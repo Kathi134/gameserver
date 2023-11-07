@@ -1,5 +1,6 @@
 package client;
 
+import java.io.Serializable;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
 import java.rmi.NotBoundException;
@@ -7,15 +8,9 @@ import java.rmi.RemoteException;
 import java.rmi.registry.LocateRegistry;
 import java.rmi.registry.Registry;
 
-import gameserver.Main;
-import utils.Connection;
-import utils.ConnectionInfo;
-import utils.GameConnectionInfo;
 import utils.GameServiceInterface;
-import utils.request.Data;
+import utils.GlobalServiceInterface;
 import utils.request.Game;
-import utils.request.Request;
-import utils.request.RequestType;
 
 public class ClientTest
 {
@@ -23,13 +18,15 @@ public class ClientTest
 	{
 		System.out.println("starting client...");
 //		final String serverIp = "185.249.198.58";
+		// maybe ist port 1109 nciht freigebeen?
 		final String serverIp = "localhost";
 		try
 		{
 			System.out.println("initializing server services");
 			Registry r = LocateRegistry.getRegistry(serverIp);
 			GameServiceInterface gameService = (GameServiceInterface) r.lookup("GameServiceInterface");
-			new Client(serverIp, gameService).run();
+			GlobalServiceInterface globalService = (GlobalServiceInterface) r.lookup("GlobalServiceInterface");
+			new Client(serverIp, gameService, globalService).run();
 		}
 		catch (RemoteException e)
 		{
@@ -42,17 +39,19 @@ public class ClientTest
 	}
 }
 
-class Client
+class Client implements Serializable
 {
-	private GameServiceInterface service;
+	private GameServiceInterface gameService;
+	private GlobalServiceInterface globalService;
 
 	private int GAME_PORT;
 	private InetAddress serverAddress;
 	private String lobbyCode;
 
-	public Client(String ip, GameServiceInterface service)
+	public Client(String ip, GameServiceInterface gameService, GlobalServiceInterface globalService)
 	{
-		this.service = service;
+		this.gameService = gameService;
+		this.globalService = globalService;
 		try
 		{
 			serverAddress = InetAddress.getByName(ip);
@@ -73,7 +72,8 @@ class Client
 			lobbyCode = openLobby();
 			System.out.println(lobbyCode);
 			joinLobby(lobbyCode);		
-			
+			gameService.move(lobbyCode);
+			System.out.println("everything works");
 		}
 		catch(Exception e)
 		{
@@ -81,33 +81,26 @@ class Client
 		}
 	}
 
-	public int getGamePort()
+	public int getGamePort() throws RemoteException
 	{
-		ConnectionInfo connectionInfo = new ConnectionInfo(serverAddress, Main.GLOBAL_PORT);
-		Connection connection = connectionInfo.connect();
-		connection.print(new Request(RequestType.PORT_REQUEST, Game.CASCADIA));
-		System.out.println("request sent");
-		Request r = connection.read();
-		Data answer = (Data) r.laod()[0];
-		return answer.i;
+		return globalService.getGamePort(Game.CASCADIA);
 	}
 
 	public void joinLobby(String lobbyCode) throws RemoteException
 	{
-		// how to determine the cai?
-		service.joinLobby(lobbyCode, null);
+		// how to determine the cai? -> maybe do a callback?
+		// problem: callback is still ran serverside -> syso on server console
+		// alternativ: in join/openLobby Socket connection aufbauen und dann ein json runden objekt übermittlen
+		gameService.joinLobby(lobbyCode, this::notify);
 	}
 	
 	public String openLobby() throws RemoteException
 	{
-		return service.openLobby();
+		return gameService.openLobby(this::notify);
 	}
-
-	private GameConnectionInfo getGameRequest()
+	
+	public void notify(String gameSnapshot)
 	{
-		if(GAME_PORT == 0)
-			return null;
-		else
-			return new GameConnectionInfo(serverAddress, GAME_PORT, 0, lobbyCode);
+		System.out.println(gameSnapshot);
 	}
 }
