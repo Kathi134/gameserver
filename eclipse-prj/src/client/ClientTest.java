@@ -90,7 +90,7 @@ class Client implements Serializable
 	{
 		// how to determine the cai? -> maybe do a callback?
 		// problem: callback is still ran serverside -> syso on server console
-		// alternativ: in join/openLobby Socket connection aufbauen und dann ein json runden objekt übermittlen
+		// alternativ: in join/openLobby Socket connection aufbauen und dann ein json runden objekt uebermittlen
 		gameService.joinLobby(lobbyCode, this::notify);
 	}
 	
