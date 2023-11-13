@@ -3,11 +3,13 @@ package utils;
 import java.rmi.Remote;
 import java.rmi.RemoteException;
 
+import client.ClientInterface;
+
 public interface GameServiceInterface extends Remote
 {
-	public String openLobby(SerializableConsumer<String> callback) throws RemoteException;
+	public String openLobby(ClientInterface client) throws RemoteException;
 	
-	public void joinLobby(String lobbyCode, SerializableConsumer<String> notifyCallback) throws RemoteException;
+	public void joinLobby(String lobbyCode, ClientInterface client) throws RemoteException;
 	
 //	public void joinLobby(String lobbyCode) throws RemoteException;
 	

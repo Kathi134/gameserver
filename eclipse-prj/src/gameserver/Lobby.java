@@ -2,14 +2,15 @@ package gameserver;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.function.Consumer;
 
-import utils.ClientAddressInformation;
+import client.ClientInterface;
 
 public class Lobby
 {
 	private int id;
 	private String lobbyCode;
-	private List<ClientAddressInformation> clients = new ArrayList<ClientAddressInformation>();
+	private List<ClientInterface> clients = new ArrayList<ClientInterface>();
 	
 	public Lobby(int id)
 	{
@@ -22,15 +23,13 @@ public class Lobby
 		return lobbyCode;
 	}
 	
-	public void addClient(ClientAddressInformation cai)
+	public void addClient(ClientInterface cai)
 	{
 		clients.add(cai);
 	}
 	
-	public void notifyAllClients(String message)
+	public void notifyAllClients(Consumer<ClientInterface> notifyFunctionality)
 	{
-		clients.stream()
-			.map(cai -> cai.callback())
-			.forEach(c -> c.accept("ring ring: " + message));
+		clients.stream().forEach(c -> notifyFunctionality.accept(c));
 	}
 }

@@ -10,6 +10,9 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.function.Consumer;
 
+//import $2a_LambdaExpressions.InstanceStringChecker;
+import client.ClientInterface;
+
 import java.util.Optional;
 
 import utils.ClientAddressInformation;
@@ -31,14 +34,14 @@ public class GameService extends UnicastRemoteObject implements GameServiceInter
 	List<Lobby> lobbies = new ArrayList<Lobby>();
 	
 	@Override
-	public String openLobby(SerializableConsumer<String> callback) throws RemoteException
+	public String openLobby(ClientInterface client) throws RemoteException
 	{
-		System.out.println("open lobby");
+		System.out.println("server: open lobby");
 		Lobby l = new Lobby(numberOfActiveLobbies++);
 		lobbies.add(l);
 		try
 		{
-			joinLobby(l.getLobbyCode(), callback);
+			joinLobby(l.getLobbyCode(), client);
 		}
 		catch (RemoteException e)
 		{
@@ -48,19 +51,19 @@ public class GameService extends UnicastRemoteObject implements GameServiceInter
 	}
 	
 	@Override
-	public void joinLobby(String lobbyCode, SerializableConsumer<String> callback) throws RemoteException
+	public void joinLobby(String lobbyCode, ClientInterface client) throws RemoteException
 	{
-		System.out.println("join lobby");
+		System.out.println("server: join lobby");
 		
-		findLobby(lobbyCode).ifPresent(l -> l.notifyAllClients("new client joined"));
-		findLobby(lobbyCode).ifPresent(l -> l.addClient(getCAI(callback)));
-		
+//		var foo = (ClientInterface inst, String str) -> inst.playerJoined(str);
+		findLobby(lobbyCode).ifPresent(l -> l.notifyAllClients(new ClientInterface()::playerJoined));
+		findLobby(lobbyCode).ifPresent(l -> l.addClient(client));
 	}
 	
 	@Override
 	public void move(String lobbyCode)
 	{
-		findLobby(lobbyCode).ifPresent(l -> l.notifyAllClients("someone moved"));
+		findLobby(lobbyCode).ifPresent(l -> l.notifyAllClients(new ClientInterface()::moveMade));
 	}
 	
 	private Optional<Lobby> findLobby(String lobbyCode)

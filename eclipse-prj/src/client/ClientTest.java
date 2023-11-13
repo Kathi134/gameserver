@@ -39,7 +39,7 @@ public class ClientTest
 	}
 }
 
-class Client implements Serializable
+class Client implements Serializable, ClientInterface
 {
 	private GameServiceInterface gameService;
 	private GlobalServiceInterface globalService;
@@ -99,8 +99,21 @@ class Client implements Serializable
 		return gameService.openLobby(this::notify);
 	}
 	
-	public void notify(String gameSnapshot)
+	@Override
+	public void playerJoined(String playerInfo) throws RemoteException
 	{
-		System.out.println(gameSnapshot);
+		System.out.println("player joined: " + playerInfo);
+	}
+
+	@Override
+	public void lobbyStarted(String playerTurn) throws RemoteException
+	{
+		System.out.println("lobby started. player turn: " + playerTurn);
+	}
+
+	@Override
+	public void moveMade(String byPlayer, String move) throws RemoteException
+	{
+		System.out.println(byPlayer + " moved: " + move);
 	}
 }
