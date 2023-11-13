@@ -1,4 +1,4 @@
-package utils;
+package legacy;
 
 import java.net.InetAddress;
 

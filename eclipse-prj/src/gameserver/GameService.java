@@ -1,23 +1,12 @@
 package gameserver;
 
-import java.net.InetAddress;
-import java.net.UnknownHostException;
 import java.rmi.RemoteException;
-import java.rmi.server.RemoteServer;
-import java.rmi.server.ServerNotActiveException;
 import java.rmi.server.UnicastRemoteObject;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.function.Consumer;
-
-//import $2a_LambdaExpressions.InstanceStringChecker;
-import client.ClientInterface;
-
 import java.util.Optional;
 
-import utils.ClientAddressInformation;
-import utils.GameServiceInterface;
-import utils.SerializableConsumer;
+import client.ClientInterface;
 
 public class GameService extends UnicastRemoteObject implements GameServiceInterface
 {
@@ -54,16 +43,33 @@ public class GameService extends UnicastRemoteObject implements GameServiceInter
 	public void joinLobby(String lobbyCode, ClientInterface client) throws RemoteException
 	{
 		System.out.println("server: join lobby");
-		
 //		var foo = (ClientInterface inst, String str) -> inst.playerJoined(str);
-		findLobby(lobbyCode).ifPresent(l -> l.notifyAllClients(new ClientInterface()::playerJoined));
+		findLobby(lobbyCode).ifPresent(l -> l.notifyAllClients(c -> {
+			try
+			{
+				c.playerJoined(client);
+			}
+			catch (RemoteException e)
+			{
+				e.printStackTrace();
+			}
+		}));
 		findLobby(lobbyCode).ifPresent(l -> l.addClient(client));
 	}
 	
 	@Override
-	public void move(String lobbyCode)
+	public void move(String lobbyCode, ClientInterface client)
 	{
-		findLobby(lobbyCode).ifPresent(l -> l.notifyAllClients(new ClientInterface()::moveMade));
+		findLobby(lobbyCode).ifPresent(l -> l.notifyAllClients(c -> {
+			try
+			{
+				c.moveMade(client, lobbyCode);
+			}
+			catch (RemoteException e)
+			{
+				e.printStackTrace();
+			}
+		}));
 	}
 	
 	private Optional<Lobby> findLobby(String lobbyCode)
@@ -71,23 +77,5 @@ public class GameService extends UnicastRemoteObject implements GameServiceInter
 		return lobbies.stream()
 			.filter(l -> l.getLobbyCode().equals(lobbyCode))
 			.findFirst();
-	}
-	
-	private InetAddress determineHost()
-	{
-		try
-		{
-			return InetAddress.getByName(RemoteServer.getClientHost());
-		}
-		catch (UnknownHostException | ServerNotActiveException e)
-		{
-			e.printStackTrace();
-		}
-		return null;
-	}
-	
-	private ClientAddressInformation getCAI(SerializableConsumer<String> callback)
-	{
-		return new ClientAddressInformation(determineHost(), callback);
 	}
 }

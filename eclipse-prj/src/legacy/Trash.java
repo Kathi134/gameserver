@@ -1,4 +1,4 @@
-package client;
+package legacy;
 
 import java.io.IOException;
 import java.net.InetAddress;
@@ -6,8 +6,6 @@ import java.net.InetSocketAddress;
 import java.net.Socket;
 import java.net.SocketTimeoutException;
 import java.net.UnknownHostException;
-
-import utils.Connection;
 
 public class Trash
 {

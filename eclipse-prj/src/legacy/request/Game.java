@@ -1,4 +1,4 @@
-package utils.request;
+package legacy.request;
 
 public enum Game implements Payload
 {

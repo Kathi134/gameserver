@@ -1,9 +1,9 @@
-package utils;
+package gameserver;
 
 import java.rmi.Remote;
 import java.rmi.RemoteException;
 
-import utils.request.Game;
+import view.Game;
 
 public interface GlobalServiceInterface extends Remote
 {

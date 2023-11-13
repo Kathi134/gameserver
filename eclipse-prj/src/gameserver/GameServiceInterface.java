@@ -1,4 +1,4 @@
-package utils;
+package gameserver;
 
 import java.rmi.Remote;
 import java.rmi.RemoteException;
@@ -13,5 +13,5 @@ public interface GameServiceInterface extends Remote
 	
 //	public void joinLobby(String lobbyCode) throws RemoteException;
 	
-	public void move(String lobbyCode) throws RemoteException;
+	public void move(String lobbyCode, ClientInterface client) throws RemoteException;
 }

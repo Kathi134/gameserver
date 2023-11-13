@@ -1,9 +1,9 @@
-package utils;
+package gameserver;
 
 import java.rmi.RemoteException;
 import java.rmi.server.UnicastRemoteObject;
 
-import utils.request.Game;
+import view.Game;
 
 public class GlobalService extends UnicastRemoteObject implements GlobalServiceInterface
 {
@@ -21,6 +21,7 @@ public class GlobalService extends UnicastRemoteObject implements GlobalServiceI
 		return switch(requestedGame) 
 		{
 			case CASCADIA -> 31193;
+			default -> throw new IllegalArgumentException("Unexpected value: " + requestedGame);
 		};
 	}
 

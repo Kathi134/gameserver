@@ -1,22 +1,19 @@
-package utils;
+package legacy;
 
-import java.io.BufferedReader;
 import java.io.Closeable;
 import java.io.IOException;
-import java.io.InputStreamReader;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
-import java.io.PrintWriter;
 import java.net.InetAddress;
 import java.net.Socket;
 
-import utils.request.Request;
+import legacy.request.Request;
 
 public class Connection implements Closeable
 {
 	private Socket commSocket;
-	private PrintWriter out;
-	private BufferedReader in;
+//	private PrintWriter out;
+//	private BufferedReader in;
 	private ObjectOutputStream objectOut;
 	private ObjectInputStream objectIn;
 	private boolean establishable;
@@ -32,9 +29,9 @@ public class Connection implements Closeable
 		this.commSocket = commSocket;
 		try
 		{
-			out = new PrintWriter(commSocket.getOutputStream(), true);
+//			out = new PrintWriter(commSocket.getOutputStream(), true);
 			objectOut = new ObjectOutputStream(commSocket.getOutputStream());
-			in = new BufferedReader(new InputStreamReader(commSocket.getInputStream()));
+//			in = new BufferedReader(new InputStreamReader(commSocket.getInputStream()));
 			objectIn = new ObjectInputStream(commSocket.getInputStream());
 			establishable = true;
 		}

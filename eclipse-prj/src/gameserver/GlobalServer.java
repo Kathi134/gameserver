@@ -5,8 +5,6 @@ package gameserver;
 import java.rmi.RemoteException;
 import java.rmi.registry.LocateRegistry;
 import java.rmi.registry.Registry;
-
-import utils.GlobalService;
 	
 public class GlobalServer
 {
