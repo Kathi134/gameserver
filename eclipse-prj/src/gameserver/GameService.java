@@ -44,17 +44,47 @@ public class GameService extends UnicastRemoteObject implements GameServiceInter
 	{
 		System.out.println("server: join lobby");
 //		var foo = (ClientInterface inst, String str) -> inst.playerJoined(str);
+		findLobby(lobbyCode).ifPresent(l -> l.addClient(client));
+		notifyClientsOnPlayerStateChange(lobbyCode);
+	}
+	
+	@Override
+	public void leaveLobby(String lobbyCode, ClientInterface client) throws RemoteException
+	{
+		System.out.println("server: leave lobby");
+		findLobby(lobbyCode).ifPresent(l -> l.removeClient(client));
+		notifyClientsOnPlayerStateChange(lobbyCode);
+	}
+	
+	private void notifyClientsOnPlayerStateChange(String lobbyCode)
+	{
 		findLobby(lobbyCode).ifPresent(l -> l.notifyAllClients(c -> {
 			try
 			{
-				c.playerJoined(client);
+				List<ClientInterface> players = findLobby(lobbyCode).get().getClients();
+				c.lobbyPlayersChanged(players);
 			}
 			catch (RemoteException e)
 			{
 				e.printStackTrace();
 			}
 		}));
-		findLobby(lobbyCode).ifPresent(l -> l.addClient(client));
+	}
+	
+	@Override
+	public void startLobby(String lobbyCode)
+	{
+		findLobby(lobbyCode).ifPresent(l -> l.start());
+		findLobby(lobbyCode).ifPresent(l -> l.notifyAllClients(c->{
+			try
+			{
+				c.notifyLobbyStarted(l.getStartingPlayer());
+			}
+			catch (RemoteException e)
+			{
+				e.printStackTrace();
+			}
+		}));
 	}
 	
 	@Override
@@ -63,7 +93,7 @@ public class GameService extends UnicastRemoteObject implements GameServiceInter
 		findLobby(lobbyCode).ifPresent(l -> l.notifyAllClients(c -> {
 			try
 			{
-				c.moveMade(client, lobbyCode);
+				c.notifyMoveMade(client, lobbyCode);
 			}
 			catch (RemoteException e)
 			{

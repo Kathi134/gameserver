@@ -15,6 +15,16 @@ public class ClientTest
 		System.out.println("starting client...");
 //		final String serverIp = "185.249.198.58";
 		// maybe ist port 1109 nciht freigebeen?
+
+		Client c = createLocalhostClient();
+		if(c != null)
+		{
+			c.testFunctionality();
+		}
+	}
+	
+	public static Client createLocalhostClient()
+	{
 		final String serverIp = "localhost";
 		try
 		{
@@ -22,7 +32,7 @@ public class ClientTest
 			Registry r = LocateRegistry.getRegistry(serverIp);
 			GameServiceInterface gameService = (GameServiceInterface) r.lookup("GameServiceInterface");
 			GlobalServiceInterface globalService = (GlobalServiceInterface) r.lookup("GlobalServiceInterface");
-			new Client(serverIp, gameService, globalService).testFunctionality();
+			return new Client(serverIp, gameService, globalService);
 		}
 		catch (RemoteException e)
 		{
@@ -32,5 +42,6 @@ public class ClientTest
 		{
 			e.printStackTrace();
 		}
+		return null;
 	}
 }

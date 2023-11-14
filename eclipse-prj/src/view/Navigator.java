@@ -10,7 +10,7 @@ class Navigator
 	public Navigator()
 	{
 		view = new View(this);
-		view.mainMenu();
+		view.welcome();
 	}
 	
 	public void endProgram()

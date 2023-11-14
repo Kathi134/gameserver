@@ -3,9 +3,12 @@ package client;
 import java.io.Serializable;
 import java.rmi.RemoteException;
 import java.rmi.server.UnicastRemoteObject;
+import java.util.ArrayList;
+import java.util.List;
 
 import gameserver.GameServiceInterface;
 import gameserver.GlobalServiceInterface;
+import view.ClientListener;
 import view.Game;
 
 public class Client extends UnicastRemoteObject implements Serializable, ClientInterface
@@ -19,6 +22,8 @@ public class Client extends UnicastRemoteObject implements Serializable, ClientI
 	private String lobbyCode;
 	
 	private String playerName = "";
+	
+	private List<ClientListener> listeners = new ArrayList<>();
 
 	public Client(String ip, GameServiceInterface gameService, GlobalServiceInterface globalService) throws RemoteException
 	{
@@ -33,9 +38,9 @@ public class Client extends UnicastRemoteObject implements Serializable, ClientI
 		{
 			GAME_PORT = getGamePort();
 			System.out.println(GAME_PORT);
-			lobbyCode = openLobby(this);
+			lobbyCode = openLobbyOnServer();
 			System.out.println(lobbyCode);
-			joinLobby("Lobby1", this);		
+			joinLobbyOnServer("Lobby1");		
 			gameService.move(lobbyCode, this);
 			System.out.println("everything works");
 		}
@@ -44,42 +49,101 @@ public class Client extends UnicastRemoteObject implements Serializable, ClientI
 			e.printStackTrace();
 		}
 	}
+	
+	public void addListener(ClientListener listener)
+	{
+		listeners.add(listener);
+	}
+	
+	public void setPlayerName(String playerName)
+	{
+		if (this.playerName!="")
+		{
+			System.err.printf("Name was already set! [from %s to %s.%n", this.playerName, playerName);
+		}
+		this.playerName = playerName;
+	}
 
 	public int getGamePort() throws RemoteException
 	{
 		return globalService.getGamePort(Game.CASCADIA);
 	}
 
-	public void joinLobby(String lobbyCode, ClientInterface client) throws RemoteException
+	public void joinLobbyOnServer(String lobbyCode) throws RemoteException
 	{
-		gameService.joinLobby(lobbyCode, client);
+		gameService.joinLobby(lobbyCode, this);
 	}
 	
-	public String openLobby(ClientInterface client) throws RemoteException
+	public void leaveLobbyOnServer(String lobbyCode) throws RemoteException
 	{
-		return gameService.openLobby(client);
+		gameService.leaveLobby(lobbyCode, this);
+	}
+	
+	public String openLobbyOnServer() throws RemoteException
+	{
+		return gameService.openLobby(this);
+	}
+	
+	public void startLobbyOnServer(String lobbyCode) throws RemoteException
+	{
+		gameService.startLobby(lobbyCode);
 	}
 	
 	@Override
-	public void playerJoined(ClientInterface joinedClient) throws RemoteException
+	public void lobbyPlayersChanged(List<ClientInterface> currentPlayersInLobby) throws RemoteException
 	{
-		System.out.println("player joined: " + joinedClient);
+		List<String> clients = currentPlayersInLobby.stream()
+			.map(p -> {
+				try
+				{
+					return p.getPlayerName();
+				}
+				catch (RemoteException e)
+				{
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+				return"";
+			})
+			.toList();
+		listeners.forEach(l->l.lobbyPlayersChanged(clients));
 	}
 
 	@Override
-	public void lobbyStarted(String playerTurn) throws RemoteException
+	public void notifyLobbyStarted(ClientInterface playerTurn) throws RemoteException
 	{
-		System.out.println("lobby started. player turn: " + playerTurn);
+		listeners.forEach(l->{
+			try
+			{
+				l.lobbyStarted(playerTurn.getPlayerName());
+			}
+			catch (RemoteException e)
+			{
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+		});
 	}
 
 	@Override
-	public void moveMade(ClientInterface byPlayer, String move) throws RemoteException
+	public void notifyMoveMade(ClientInterface byPlayer, String move) throws RemoteException
 	{
-		System.out.println(byPlayer + " moved: " + move);
+		listeners.forEach(l->{
+			try
+			{
+				l.moveMade(byPlayer.getPlayerName(), move);
+			}
+			catch (RemoteException e)
+			{
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+		});
 	}
 	
-	public String getPlayerId()
+	public String getPlayerName() throws RemoteException
 	{
 		return playerName;
 	}
+
 }
