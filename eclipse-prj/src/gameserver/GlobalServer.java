@@ -6,14 +6,12 @@ import java.rmi.registry.Registry;
 	
 public class GlobalServer
 {
-	private final int PORT;
 //	private final String ipAdress = "localhost";
 	public static final String IP_ADDRESS = "185.249.198.58";
 	
-	public GlobalServer(int p) 
+	public GlobalServer() 
 	{
 		System.out.println("starting server...");
-		PORT = p;
 	}
 
 	public void run()
