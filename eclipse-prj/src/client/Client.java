@@ -100,7 +100,6 @@ public class Client extends UnicastRemoteObject implements Serializable, ClientI
 				}
 				catch (RemoteException e)
 				{
-					// TODO Auto-generated catch block
 					e.printStackTrace();
 				}
 				return"";
@@ -119,7 +118,6 @@ public class Client extends UnicastRemoteObject implements Serializable, ClientI
 			}
 			catch (RemoteException e)
 			{
-				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
 		});
@@ -135,7 +133,6 @@ public class Client extends UnicastRemoteObject implements Serializable, ClientI
 			}
 			catch (RemoteException e)
 			{
-				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
 		});

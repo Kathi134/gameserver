@@ -8,14 +8,14 @@ import javax.swing.JTextArea;
 
 import model.Bet;
 
-public class TerminalKeyListener implements KeyListener
+public class TerminalBetKeyListener implements KeyListener
 {
 	private JTextArea terminal;
 	private int charsEnteredByUser = 0;
 	
-	private MultiGUIApp guiRoot;
+	private GUIRoot guiRoot;
 	
-	public TerminalKeyListener(JTextArea terminal, MultiGUIApp guiRoot)
+	public TerminalBetKeyListener(JTextArea terminal, GUIRoot guiRoot)
 	{
 		this.guiRoot = guiRoot;
 		this.terminal = terminal;
@@ -37,9 +37,10 @@ public class TerminalKeyListener implements KeyListener
 		else if(inputChar == '\n' || e.getKeyCode() == KeyEvent.VK_ENTER)
 		{
 			terminal.append(String.valueOf(inputChar));
-			String text = terminal.getText().trim();
-			text = text.substring(text.length() - charsEnteredByUser);
-			if("doubt".equals(text.toLowerCase()))
+			charsEnteredByUser++;
+			String text = terminal.getText();
+			text = text.substring(text.length() - charsEnteredByUser).trim();
+			if(text.toLowerCase().contains("doubt"))
 			{
 				guiRoot.doubt();
 			}
@@ -55,6 +56,11 @@ public class TerminalKeyListener implements KeyListener
 			terminal.append(String.valueOf(inputChar));
 			charsEnteredByUser++;
 		}	
+	}
+	
+	public void clear()
+	{
+		charsEnteredByUser = 0;
 	}
 
 	@Override

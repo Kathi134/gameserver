@@ -13,6 +13,8 @@ public class Board extends Subject
 	private Dice[] dice = new Dice[CUP_SIZE];
 	private int lockedDice = 0;
 	
+	private boolean eliminated;
+	
 	public Board()
 	{
 		Arrays.setAll(dice, i->new Dice());
@@ -29,6 +31,7 @@ public class Board extends Subject
 		if(amount+lockedDice >= CUP_SIZE)
 		{
 			Arrays.stream(dice).forEach(Dice::lock);
+			eliminated = true;
 		}
 		else
 		{
@@ -47,5 +50,10 @@ public class Board extends Subject
 	public Dice[] getDice()
 	{
 		return Arrays.copyOf(dice, dice.length);
+	}
+	
+	public boolean isEliminated()
+	{
+		return eliminated;
 	}
 }

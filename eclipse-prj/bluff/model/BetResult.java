@@ -1,6 +1,6 @@
 package model;
 
-public enum BetResult
+public record BetResult(BetResultType result, int winningPlayer, int[] loosingPlayers, int lostDice)
 {
-	BET_WON, BET_LOST, BET_EXACT_MATCH;
+	
 }

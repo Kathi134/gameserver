@@ -10,10 +10,7 @@ public class GlobalService extends UnicastRemoteObject implements GlobalServiceI
 	private static final long serialVersionUID = 1L;
 
 	public GlobalService() throws RemoteException
-	{
-		super();
-		// TODO Auto-generated constructor stub
-	}
+	{}
 
 	@Override
 	public int getGamePort(Game requestedGame)

@@ -6,6 +6,7 @@ import java.rmi.registry.LocateRegistry;
 import java.rmi.registry.Registry;
 
 import gameserver.GameServiceInterface;
+import gameserver.GlobalServer;
 import gameserver.GlobalServiceInterface;
 
 public class ClientTest
@@ -13,7 +14,6 @@ public class ClientTest
 	public static void main(String[] args)
 	{
 		System.out.println("starting client...");
-//		final String serverIp = "185.249.198.58";
 		// maybe ist port 1109 nciht freigebeen?
 
 		Client c = createLocalhostClient();
@@ -25,7 +25,8 @@ public class ClientTest
 	
 	public static Client createLocalhostClient()
 	{
-		final String serverIp = "localhost";
+//		final String serverIp = "localhost";
+		final String serverIp = GlobalServer.IP_ADDRESS;
 		try
 		{
 			System.out.println("initializing server services");

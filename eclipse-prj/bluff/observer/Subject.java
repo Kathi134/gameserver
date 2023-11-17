@@ -21,7 +21,6 @@ public abstract class Subject implements Serializable
     		observers = new ArrayList<>();
     	}
         observers.add(observer);
-        observer.update(this.getClass());
     }
 
     public void unsubscribe(Observer observer)

@@ -43,7 +43,6 @@ public class GameService extends UnicastRemoteObject implements GameServiceInter
 	public void joinLobby(String lobbyCode, ClientInterface client) throws RemoteException
 	{
 		System.out.println("server: join lobby");
-//		var foo = (ClientInterface inst, String str) -> inst.playerJoined(str);
 		findLobby(lobbyCode).ifPresent(l -> l.addClient(client));
 		notifyClientsOnPlayerStateChange(lobbyCode);
 	}

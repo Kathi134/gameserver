@@ -9,8 +9,10 @@ import javax.swing.JScrollPane;
 import javax.swing.JTextArea;
 
 import model.Bet;
+import model.BetResult;
+import model.BetResultType;
 
-public class MultiGUIApp
+public class GUIRoot
 {
 	private Controller controller;
 
@@ -22,7 +24,7 @@ public class MultiGUIApp
 
 	private int activePlayer;
 
-	public MultiGUIApp(int numberOfPlayers, Controller controller)
+	public GUIRoot(int numberOfPlayers, Controller controller)
 	{
 		this.controller = controller;
 		terminals = new Terminal[numberOfPlayers];
@@ -57,12 +59,13 @@ public class MultiGUIApp
 
 	public void setActivePlayer(int playerId)
 	{
+		Arrays.stream(terminals).forEach(Terminal::updateRemainingDice);
 		this.activePlayer = playerId;
 		for(int i=0; i<terminals.length; i++)
 		{
 			if(i == playerId)
 			{
-				terminals[i].enableInput();
+				terminals[i].enableBetInput();
 			}
 			else
 			{
@@ -76,7 +79,6 @@ public class MultiGUIApp
 		Arrays.stream(terminals).forEach(t -> 
 		{
 			t.disableInput();
-//			t.printNewLineIfNot();
 			t.printlnMessage(activePlayer + " doubted " + currentBet);
 		});
 		controller.doubt();
@@ -84,7 +86,53 @@ public class MultiGUIApp
 	
 	public void showResult()
 	{
+		BetResult resultTriple = controller.getLastBetResult();
+		int bettingPlayer = controller.getBettingPlayerId();
+		String s1 = String.format("%d's bet was %s.\n", bettingPlayer, getResultText(resultTriple.result(), resultTriple.lostDice()));
+		String s2 = String.format("%d won the bet. ", resultTriple.winningPlayer());
+		String s3 = String.format("%s lost %d dice.", Arrays.toString(resultTriple.loosingPlayers()), resultTriple.lostDice());
+		Arrays.stream(terminals).forEach(t -> t.printlnMessage(s1+s2+s3));
 		
+		currentBet = null;
+		activePlayer = -1;
+	}
+	
+	public String getResultText(BetResultType value, int lostDice)
+	{
+		return switch(value)
+		{
+			case BET_WON -> "correct";
+			case BET_EXACT_MATCH -> "exactly correct";
+			case BET_LOST -> "off by " + lostDice;
+		};
+	}
+	
+	public void sendBet()
+	{
+		if (controller.isValidBet(currentBet))
+		{
+			controller.sendBet(currentBet);			
+		}
+		else
+		{
+			terminals[activePlayer].processInvalidBet();
+		}
+	}
+	
+	public void endGame(int winnerId)
+	{
+		Arrays.stream(terminals).forEach(t -> 
+		{
+			t.printlnMessage(String.format("%d won the game!", winnerId));
+			t.enableReturnInput(te -> backToLobby(te));
+		});
+	}
+	
+	private void backToLobby(Terminal terminal)
+	{
+		terminal.clearTerminal();
+		terminal.printlnMessage("simulate being back in the lobby.");
+		terminal.printlnMessage("bye.");
 	}
 	
 	public void setCurrentBet(Bet bet)
@@ -92,10 +140,6 @@ public class MultiGUIApp
 		currentBet = bet;
 	}
 	
-	public void sendBet()
-	{
-		controller.sendBet(currentBet);
-	}
 	
 	public Controller getController()
 	{

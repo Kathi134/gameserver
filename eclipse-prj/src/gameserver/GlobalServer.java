@@ -1,5 +1,3 @@
-
-
 package gameserver;
 
 import java.rmi.RemoteException;
@@ -9,19 +7,18 @@ import java.rmi.registry.Registry;
 public class GlobalServer
 {
 	private final int PORT;
+//	private final String ipAdress = "localhost";
+	public static final String IP_ADDRESS = "185.249.198.58";
 	
 	public GlobalServer(int p) 
 	{
 		System.out.println("starting server...");
 		PORT = p;
-//		GameService service;
-		
 	}
 
 	public void run()
 	{
 		prepareRMIService();
-		
 	}
 	
 	private void prepareRMIService()
@@ -29,6 +26,7 @@ public class GlobalServer
 		System.out.println("initializing services...");
 		try
 		{
+			System.setProperty("java.rmi.server.hostname", IP_ADDRESS);
 			LocateRegistry.createRegistry(Registry.REGISTRY_PORT);
 			Registry registry = LocateRegistry.getRegistry();
 
@@ -42,7 +40,6 @@ public class GlobalServer
 		}
 		catch (RemoteException e)
 		{
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 	}
