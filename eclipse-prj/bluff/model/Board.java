@@ -6,6 +6,8 @@ import observer.Subject;
 
 public class Board extends Subject
 {
+	private static final long serialVersionUID = 1L;
+
 	public static final int CUP_SIZE = 5;
 	
 	private Dice[] dice = new Dice[CUP_SIZE];
@@ -18,7 +20,7 @@ public class Board extends Subject
 	
 	public void rollAvailable()
 	{
-		Arrays.stream(dice).filter(d->!d.isLocked()).forEach(Dice::roll);
+		Arrays.stream(getAvailableDice()).forEach(Dice::roll);
 		notifyObservers();
 	}
 	
@@ -35,6 +37,11 @@ public class Board extends Subject
 				dice[lockedDice++].lock();
 			}
 		}
+	}
+	
+	public Dice[] getAvailableDice()
+	{
+		return Arrays.stream(dice).filter(d->!d.isLocked()).toArray(Dice[]::new);
 	}
 	
 	public Dice[] getDice()

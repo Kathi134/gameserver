@@ -10,22 +10,28 @@ import observer.Subject;
 
 public class Terminal extends Observer
 {
-	private Controller controller;
+	private MultiGUIApp guiRoot;
 
+	private TerminalKeyListener listener;
 	private JTextArea guiElement;
 	private Dice[] observedDiceState;
 	private int id;
 
-	public Terminal(JTextArea guiElement, Controller controller, int id)
+	public Terminal(JTextArea guiElement, MultiGUIApp guiRoot, int id)
 	{
-		this.guiElement = guiElement;
-		guiElement.addKeyListener(new TerminalKeyListener(guiElement));
-		this.controller = controller;
 		this.id = id;
-		this.controller.subscribeObserverOnDice(this, id);
+		this.guiElement = guiElement;
+		this.listener = new TerminalKeyListener(guiElement, guiRoot);
+		this.guiRoot = guiRoot;
+		this.guiRoot.getController().subscribeObserverOnDice(this, id);
+	}
+	
+	public void printMessage(String message)
+	{
+		guiElement.append(message);
 	}
 
-	public void printMessage(String message)
+	public void printlnMessage(String message)
 	{
 		guiElement.append(message);
 		guiElement.append("\n");
@@ -34,7 +40,7 @@ public class Terminal extends Observer
 	@Override
 	public void update(Class<? extends Subject> subjectClass)
 	{
-		observedDiceState = controller.getRound().getDiceOfPlayer(id);
+		observedDiceState = guiRoot.getController().getRound().getDiceOfPlayer(id);
 		showDice();
 	}
 
@@ -42,6 +48,24 @@ public class Terminal extends Observer
 	{
 		String str = Arrays.stream(observedDiceState).filter(d -> !d.isLocked())
 				.map(d -> String.valueOf(d.readCurrentDots())).reduce("", (a, b) -> a + " " + b);
-		printMessage(str);
+		printlnMessage(str);
 	}
+	
+	public void disableInput()
+	{
+		guiElement.removeKeyListener(listener);
+	}
+	
+	public void enableInput()
+	{
+		if (guiRoot.getCurrentBet() != null)
+		{	
+			printlnMessage("[doubt] " + guiRoot.getController().getRound().getPreviousPlayerId() + "'s debt: " + guiRoot.getCurrentBet());
+			printMessage("or ");
+		}
+		printlnMessage("put your bet: At least [amount] times [value]");
+		guiElement.addKeyListener(listener);
+	}
+	
+	
 }

@@ -26,4 +26,9 @@ public class Dice
 	{
 		return currentDots;
 	}
+	
+	public DiceValue getDiceValue()
+	{
+		return DiceValue.fromIntValue(currentDots);
+	}
 }

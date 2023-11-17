@@ -1,10 +1,14 @@
 package view;
 
-import javax.swing.*;
+import java.awt.GridLayout;
+import java.util.Arrays;
 
-import model.Board;
+import javax.swing.JFrame;
+import javax.swing.JPanel;
+import javax.swing.JScrollPane;
+import javax.swing.JTextArea;
 
-import java.awt.*;
+import model.Bet;
 
 public class MultiGUIApp
 {
@@ -14,6 +18,9 @@ public class MultiGUIApp
 	private JFrame frame;
 
 	private Terminal[] terminals;
+	private Bet currentBet;
+
+	private int activePlayer;
 
 	public MultiGUIApp(int numberOfPlayers, Controller controller)
 	{
@@ -41,17 +48,68 @@ public class MultiGUIApp
 			JScrollPane scrollPane = new JScrollPane(terminal);
 			mainPanel.add(scrollPane);
 
-			terminals[i] = new Terminal(terminal, controller, i);
+			terminals[i] = new Terminal(terminal, this, i);
 		}
 
 		frame.getContentPane().add(mainPanel);
 		frame.setVisible(true);
 	}
 
-	private void printMessageOnTerminal(String message, int terminalId)
+	public void setActivePlayer(int playerId)
 	{
-		SwingUtilities.invokeLater(() -> terminals[terminalId].printMessage(message));
+		this.activePlayer = playerId;
+		for(int i=0; i<terminals.length; i++)
+		{
+			if(i == playerId)
+			{
+				terminals[i].enableInput();
+			}
+			else
+			{
+				terminals[i].disableInput();
+			}
+		}
 	}
-
+	
+	public void doubt()
+	{
+		Arrays.stream(terminals).forEach(t -> 
+		{
+			t.disableInput();
+//			t.printNewLineIfNot();
+			t.printlnMessage(activePlayer + " doubted " + currentBet);
+		});
+		controller.doubt();
+	}
+	
+	public void showResult()
+	{
+		
+	}
+	
+	public void setCurrentBet(Bet bet)
+	{
+		currentBet = bet;
+	}
+	
+	public void sendBet()
+	{
+		controller.sendBet(currentBet);
+	}
+	
+	public Controller getController()
+	{
+		return controller;
+	}
+	
+	public int getCurrentPlayer()
+	{
+		return activePlayer;
+	}
+	
+	public Bet getCurrentBet()
+	{
+		return currentBet;
+	}
 }
 

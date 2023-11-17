@@ -1,15 +1,13 @@
 package view;
 
+import model.Bet;
 import model.Round;
 import observer.Observer;
 
 public class Controller
 {
-	// todo: enable terminal on turn only
-	
-	
 	private Round round;
-	private MultiGUIApp screens;
+	private MultiGUIApp guiRoot;
 
 	public Controller()
 	{
@@ -19,8 +17,14 @@ public class Controller
 	public void startRound(int numberOfPlayers)
 	{
 		round = new Round(numberOfPlayers);
-		screens = new MultiGUIApp(numberOfPlayers, this);
+		guiRoot = new MultiGUIApp(numberOfPlayers, this);
 		round.enableNextRoll();
+		updateGuiRootActivePlayer();
+	}
+	
+	private void updateGuiRootActivePlayer()
+	{
+		guiRoot.setActivePlayer(round.getActivePlayer());
 	}
 
 	public void subscribeObserverOnDice(Observer observer, int playerId)
@@ -33,5 +37,18 @@ public class Controller
 	public Round getRound()
 	{
 		return round;
+	}
+	
+	public void doubt()
+	{
+		round.activePlayerDoubt();
+		guiRoot.showResult();
+		round.enableNextRoll();
+	}
+	
+	public void sendBet(Bet bet)
+	{
+		round.setCurrentBet(bet);
+		updateGuiRootActivePlayer();
 	}
 }
