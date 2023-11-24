@@ -1,0 +1,3 @@
+- error on apt: 
+    - error: `malformed entry in in list file /etc/apt/sources.list.d/jdk19.list`
+    - fix: `sudo rm /etc/apt/sources.list.d/jdk19.list`
