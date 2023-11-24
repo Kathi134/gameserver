@@ -1,2 +1,3 @@
 - run gdx-setup.jar in ubuntu vm
-- import in eclipse with gradle 8.5r
+- import in eclipse with gradle 8.5r 
+    - or even better: gradle wrapper radio button
