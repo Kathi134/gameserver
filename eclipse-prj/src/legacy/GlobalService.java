@@ -1,4 +1,4 @@
-package gameserver;
+package legacy;
 
 import java.rmi.RemoteException;
 import java.rmi.server.UnicastRemoteObject;

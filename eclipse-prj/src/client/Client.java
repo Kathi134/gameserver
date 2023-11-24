@@ -7,28 +7,23 @@ import java.util.ArrayList;
 import java.util.List;
 
 import gameserver.GameServiceInterface;
-import gameserver.GlobalServiceInterface;
 import view.ClientListener;
-import view.Game;
 
 public class Client extends UnicastRemoteObject implements Serializable, ClientInterface
 {
 	private static final long serialVersionUID = 1L;
 	
 	private GameServiceInterface gameService;
-	private GlobalServiceInterface globalService;
 
-	private int GAME_PORT;
 	private String lobbyCode;
 	
 	private String playerName = "";
 	
 	private List<ClientListener> listeners = new ArrayList<>();
 
-	public Client(String ip, GameServiceInterface gameService, GlobalServiceInterface globalService) throws RemoteException
+	public Client(String ip, GameServiceInterface gameService) throws RemoteException
 	{
 		this.gameService = gameService;
-		this.globalService = globalService;
 	}
 
 	public void testFunctionality()
@@ -36,8 +31,6 @@ public class Client extends UnicastRemoteObject implements Serializable, ClientI
 		System.out.println("testing functionality");
 		try
 		{
-			GAME_PORT = getGamePort();
-			System.out.println(GAME_PORT);
 			lobbyCode = openLobbyOnServer();
 			System.out.println(lobbyCode);
 			joinLobbyOnServer("Lobby1");		
@@ -62,11 +55,6 @@ public class Client extends UnicastRemoteObject implements Serializable, ClientI
 			System.err.printf("Name was already set! [from %s to %s.%n", this.playerName, playerName);
 		}
 		this.playerName = playerName;
-	}
-
-	public int getGamePort() throws RemoteException
-	{
-		return globalService.getGamePort(Game.CASCADIA);
 	}
 
 	public void joinLobbyOnServer(String lobbyCode) throws RemoteException

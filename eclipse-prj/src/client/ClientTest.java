@@ -6,34 +6,33 @@ import java.rmi.registry.LocateRegistry;
 import java.rmi.registry.Registry;
 
 import gameserver.GameServiceInterface;
-import gameserver.GlobalServer;
-import gameserver.GlobalServiceInterface;
 
 public class ClientTest
 {
+	public static final String LOCALHOST = "localhost";
+	public static final String ZAP_SERVER = "185.249.198.58";
+	public static final String PC_IP = "192.168.1.117";
+	
 	public static void main(String[] args)
 	{
 		System.out.println("starting client...");
 		// maybe ist port 1109 nciht freigebeen?
 
-		Client c = createLocalhostClient();
+		Client c = createClient(PC_IP);
 		if(c != null)
 		{
 			c.testFunctionality();
 		}
 	}
 	
-	public static Client createLocalhostClient()
+	public static Client createClient(String serverIp)
 	{
-//		final String serverIp = "localhost";
-		final String serverIp = GlobalServer.IP_ADDRESS;
 		try
 		{
 			System.out.println("initializing server services");
 			Registry r = LocateRegistry.getRegistry(serverIp);
 			GameServiceInterface gameService = (GameServiceInterface) r.lookup("GameServiceInterface");
-			GlobalServiceInterface globalService = (GlobalServiceInterface) r.lookup("GlobalServiceInterface");
-			return new Client(serverIp, gameService, globalService);
+			return new Client(serverIp, gameService);
 		}
 		catch (RemoteException e)
 		{

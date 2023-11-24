@@ -22,7 +22,7 @@ public class View implements ClientListener
 	public View(Navigator nav)
 	{
 		navigator = nav;
-		networkClient = ClientTest.createLocalhostClient();
+		networkClient = ClientTest.createClient(ClientTest.PC_IP);
 		networkClient.addListener(this);
 	}
 
